@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items Inventory Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<style>
+    :root {
+        --app-bg: #f8fafc;
+        --sidebar-bg: #111c2e;
+        --sidebar-text: #94a3b8;
+        --border-color: #cbd5e1;
+        --border-light: #e2e8f0;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --primary-indigo: #4f46e5;
+        --primary-indigo-hover: #4338ca;
+        --accent-orange: #ea580c;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+        background: var(--app-bg);
+        color: var(--text-main);
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .app-container {
+        display: flex;
+        height: 100vh;
+    }
+
+    /* Dashboard Sidebar styles matching previous outputs */
+    .sidebar {
+        width: 240px;
+        background: var(--sidebar-bg);
+        color: #fff;
+        padding: 16px 0;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .business-profile {
+        padding: 0 16px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #1f2937;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        background: #6d28d9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .profile-info h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #f8fafc;
+    }
+
+    .profile-info p {
+        font-size: 11px;
+        color: var(--sidebar-text);
+    }
+
+    .btn-create-invoice {
+        margin: 16px;
+        background: #fff;
+        border: none;
+        color: #1e293b;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .nav-links {
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #475569;
+        padding: 16px 16px 6px;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-links a {
+        padding: 10px 16px;
+        color: var(--sidebar-text);
+        font-size: 13px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        background: #1e293b;
+        color: #fff;
+    }
+
+    .nav-links a.active {
+        color: #fff;
+        background-color: #1e2538;
+        font-weight: 600;
+        border-left: 4px solid var(--primary-indigo);
+        padding-left: 12px;
+    }
+
+    .sub-arrow {
+        margin-left: auto;
+        font-size: 10px;
+    }
+
+    .sub-nav-links {
+        background: #0f172a;
+        padding: 4px 0;
+    }
+
+    .sub-nav-links a {
+        padding: 8px 16px 8px 44px;
+        font-size: 12.5px;
+        color: #38bdf8;
+        background: #1e293b;
+        font-weight: 600;
+        border-left: 3px solid #38bdf8;
+    }
+
+    .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid #1f2937;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sidebar-footer a {
+        color: var(--sidebar-text);
+        font-size: 13px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .security-badges {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #475569;
+        font-weight: 500;
+    }
+
+    /* Workspace Headings Layout panels */
+    .main-workspace {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .workspace-header {
+        background: #fff;
+        height: 56px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+        flex-shrink: 0;
+    }
+
+    .workspace-header h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .header-right-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn-outline-purple-light {
+        background: #fff;
+        border: 1px solid #7c3aed;
+        color: #7c3aed;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-outline-gray {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        color: #475569;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .icon-action-btn {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    /* Dashboard Main Window Body Workspace Box Container */
+    .dashboard-canvas {
+        padding: 16px 24px;
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: #f8fafc;
+    }
+
+    /* Summary Stat Row Widgets block styles */
+    .stock-metrics-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .metric-block-card {
+        background: #ffffff;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        padding: 16px;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01);
+    }
+
+    .metric-top-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .metric-top-label.font-orange {
+        color: var(--accent-orange);
+    }
+
+    .info-icon {
+        font-size: 11px;
+        color: #94a3b8;
+        cursor: pointer;
+    }
+
+    .metric-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-top: 6px;
+    }
+
+    .secondary-link-icon {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        font-size: 13px;
+        color: #94a3b8;
+        cursor: pointer;
+    }
+
+    /* Filter Action Strip elements styles */
+    .filter-action-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .filters-left-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-box-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding-right: 10px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .search-box-wrapper input {
+        height: 34px;
+        width: 220px;
+        border: none;
+        padding-left: 32px;
+        font-size: 12.5px;
+        outline: none;
+        background: transparent;
+    }
+
+    .slider-search-icon {
+        font-size: 12px;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .dropdown-filter select {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        height: 34px;
+        padding: 0 12px;
+        font-size: 12.5px;
+        color: #475569;
+        outline: none;
+        cursor: pointer;
+        min-width: 150px;
+    }
+
+    .btn-toggle-badge {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        height: 34px;
+        padding: 0 12px;
+        font-size: 12.5px;
+        border-radius: 4px;
+        color: #475569;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .actions-right-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-dropdown-outline {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        height: 34px;
+        padding: 0 14px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #475569;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-create-primary {
+        background: var(--primary-indigo);
+        border: none;
+        color: #ffffff;
+        height: 34px;
+        padding: 0 18px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-create-primary:hover {
+        background: var(--primary-indigo-hover);
+    }
+
+    /* Main Items Output Data Grid Tables Component rules */
+    .table-container {
+        background: #ffffff;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+    }
+
+    .data-list-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .data-list-table th {
+        background: #f1f5f9;
+        padding: 12px 16px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .sort-icon {
+        font-size: 9px;
+        margin-left: 4px;
+        color: #94a3b8;
+    }
+
+    .data-list-table td {
+        padding: 12px 16px;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    .data-list-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .item-name-cell .main-title {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .sub-badge-label {
+        display: inline-block;
+        background: #f1f5f9;
+        border-radius: 4px;
+        font-size: 10px;
+        color: #64748b;
+        padding: 1px 6px;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    .price-value {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .muted-dash {
+        color: #cbd5e1;
+        font-weight: bold;
+    }
+
+    .actions-cell {
+        text-align: center;
+        color: #94a3b8;
+        cursor: pointer;
+    }
+
+    /* Lower Footer CTA Cards layouts structures */
+    .excel-upload-card {
+        background: #eff6ff;
+        border: 1px dashed #3b82f6;
+        border-radius: 8px;
+        padding: 20px 24px;
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .upload-left-illustration {
+        background: #fff;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #bfdbfe;
+    }
+
+    .monitor-mock-box {
+        font-size: 24px;
+        color: #3b82f6;
+    }
+
+    .upload-right-content h3 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 2px;
+    }
+
+    .upload-right-content p {
+        font-size: 11.5px;
+        color: #1e40af;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .upload-btn-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn-sub-action {
+        background: #fff;
+        border: 1px solid #bfdbfe;
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-excel-primary {
+        background: #22c55e;
+        border: none;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+
+    /* ==========================================================================
+   3. "CREATE NEW ITEM" COMPONENT DIALOG MODAL LAYOUT OVERLAY WINDOW RULES 
+   ========================================================================== */
+    .modal-backdrop-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+
+    .modal-window-box {
+        background: #ffffff;
+        width: 100%;
+        max-width: 820px;
+        border-radius: 8px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+
+    .modal-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
+    }
+
+    .modal-header h3 {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .close-modal-btn {
+        color: #64748b;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    .close-modal-btn:hover {
+        color: #1e293b;
+    }
+
+    /* Internal Horizontal Column splits workspace layouts rules */
+    .modal-split-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* Left Drawer Form Option Panels component anchors */
+    .modal-left-nav-tabs {
+        width: 180px;
+        border-right: 1px solid var(--border-light);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        background: #ffffff;
+        flex-shrink: 0;
+    }
+
+    .advance-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #1e293b;
+        padding: 14px 8px 6px;
+        text-transform: capitalize;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 8px;
+    }
+
+    .tab-item {
+        background: transparent;
+        border: none;
+        text-align: left;
+        padding: 9px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #475569;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tab-item:hover {
+        background: #f8fafc;
+        color: #1e293b;
+    }
+
+    .tab-item.active {
+        background: #f3e8ff;
+        color: #6b21a8;
+        font-weight: 600;
+    }
+
+    .required-dot {
+        color: #ef4444;
+        margin-left: 2px;
+        font-weight: bold;
+    }
+
+    /* Form Field Components Structure blocks */
+    .modal-right-form-content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #ffffff;
+    }
+
+    .form-row-grid {
+        display: grid;
+        gap: 16px;
+    }
+
+    .form-row-grid.column-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .margin-top-md {
+        margin-top: 16px;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-group-block.flex-center-space-between {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 24px;
+    }
+
+    .input-field-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .inline-toggle-label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    /* Standard Input Custom Field Box Modifiers */
+    .form-text-input {
+        height: 36px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+        color: #334155;
+        width: 100%;
+        transition: border-color 0.15s ease;
+    }
+
+    .form-text-input:focus {
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.15);
+    }
+
+    /* Custom Radio pill selectors components inside layout blocks */
+    .radio-toggle-group {
+        display: flex;
+        gap: 12px;
+        height: 36px;
+    }
+
+    .radio-label-pill {
+        flex: 1;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        padding: 0 16px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .radio-label-pill input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .custom-radio-dot {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #cbd5e1;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+    }
+
+    .radio-label-pill.checked {
+        border-color: #7c3aed;
+        background: #faf5ff;
+        color: #6b21a8;
+        font-weight: 600;
+    }
+
+    .radio-label-pill.checked .custom-radio-dot {
+        border-color: #7c3aed;
+    }
+
+    .radio-label-pill.checked .custom-radio-dot::after {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #7c3aed;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+    }
+
+    /* Select wrapper structural dropdown arrows box rules */
+    .select-dropdown-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .select-dropdown-wrapper select {
+        width: 100%;
+        height: 36px;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        padding: 0 12px;
+        font-size: 13px;
+        color: #334155;
+        outline: none;
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .select-dropdown-wrapper::after {
+        content: '\f078';
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        font-size: 10px;
+        color: #64748b;
+        pointer-events: none;
+    }
+
+    .select-dropdown-wrapper.clear-search-icon .select-embedded-glass {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .select-dropdown-wrapper.clear-search-icon select.indent-select-text {
+        padding-left: 32px;
+    }
+
+    /* Custom Compound Prefix / Suffix Entry Row Components */
+    .input-inner-addon-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .addon-prefix {
+        position: absolute;
+        left: 12px;
+        font-size: 13px;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .form-text-input.dynamic-padding {
+        padding-left: 28px;
+        padding-right: 90px;
+    }
+
+    .addon-select-suffix {
+        position: absolute;
+        right: 1px;
+        top: 1px;
+        bottom: 1px;
+        background: #f8fafc;
+        border-left: 1px solid #cbd5e1;
+        border-radius: 0 4px 4px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .addon-select-suffix select {
+        border: none;
+        background: transparent;
+        height: 100%;
+        padding: 0 24px 0 10px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #475569;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .addon-text-suffix {
+        position: absolute;
+        right: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        pointer-events: none;
+    }
+
+    /* IOS Style Rounded Toggle Button checkbox */
+    .switch-toggle-btn {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 20px;
+    }
+
+    .switch-toggle-btn input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .switch-slider-round {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: .2s;
+        border-radius: 20px;
+    }
+
+    .switch-slider-round::before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .2s;
+        border-radius: 50%;
+    }
+
+    .switch-toggle-btn input:checked+.switch-slider-round {
+        background-color: #22c55e;
+    }
+
+    .switch-toggle-btn input:checked+.switch-slider-round::before {
+        transform: translateX(14px);
+    }
+
+    /* Modal Bottom Action Controls elements styles */
+    .modal-footer-action-strip {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
+        flex-shrink: 0;
+    }
+
+    .btn-modal-cancel {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        color: #475569;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .modal-save-group {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-modal-secondary-save {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-modal-primary-save {
+        background: #eddffc;
+        border: none;
+        color: #c084fc;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+</style>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="business-profile">
+                <div class="avatar">S</div>
+                <div class="profile-info">
+                    <h4>salman enterprise</h4>
+                    <p>9833752903</p>
+                </div>
+            </div>
+        
+            <button class="btn-create-invoice">
+                <i class="fa-solid fa-plus"></i> Create Sales Invoice 
+                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+            </button>
+        
+            <nav class="nav-links">
+                <a href="#"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+                
+                <a href="#" class="active"><i class="fa-solid fa-box"></i> Item</a>
+                
+                <a href="#"><i class="fa-solid fa-user-group"></i> Clients</a>
+                
+                <a href="#"><i class="fa-solid fa-file-lines"></i> Proforma</a>
+                
+                <a href="#"><i class="fa-solid fa-receipt"></i> Invoice</a>
+            </nav>
+        </aside>
+
+        <main class="main-workspace">
+            <header class="workspace-header">
+                <h2>Items</h2>
+                <div class="header-right-actions">
+                    <button class="btn-outline-purple-light">Manage Offer</button>
+                    <button class="btn-outline-gray"><i class="fa-solid fa-file-invoice"></i> Reports <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <button class="icon-action-btn"><i class="fa-solid fa-gear"></i></button>
+                    <button class="icon-action-btn"><i class="fa-solid fa-print"></i></button>
+                </div>
+            </header>
+
+            <div class="dashboard-canvas">
+
+                <div class="stock-metrics-row">
+                    <div class="metric-block-card">
+                        <div class="metric-top-label">Stock Value <i class="fa-solid fa-circle-info info-icon"></i>
+                        </div>
+                        <div class="metric-value">₹ 0</div>
+                        <i class="fa-solid fa-arrow-up-right-from-square secondary-link-icon"></i>
+                    </div>
+                    <div class="metric-block-card">
+                        <div class="metric-top-label font-orange">Low Stock</div>
+                        <div class="metric-value">0</div>
+                        <i class="fa-solid fa-arrow-up-right-from-square secondary-link-icon"></i>
+                    </div>
+                </div>
+
+                <div class="filter-action-strip">
+                    <div class="filters-left-group">
+                        <div class="search-box-wrapper">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" placeholder="Search by Custom Fields">
+                            <i class="fa-solid fa-sliders slider-search-icon"></i>
+                        </div>
+
+                        <div class="dropdown-filter">
+                            <select>
+                                <option>Search Categories</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-toggle-badge"><i class="fa-solid fa-filter"></i> Low Stock</button>
+                    </div>
+
+                    <div class="actions-right-group">
+                        <button class="btn-dropdown-outline">Bulk Actions <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                        <button class="btn-create-primary" onclick="toggleItemModal(true)">Create Item</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-list-table">
+                        <thead>
+                            <tr>
+                                <th width="4%"><input type="checkbox"></th>
+                                <th width="36%">Item Name <i
+                                        class="fa-solid fa-arrow-down-up-across-line sort-icon"></i></th>
+                                <th width="15%">Item Code</th>
+                                <th width="15%">Stock QTY <i
+                                        class="fa-solid fa-arrow-down-up-across-line sort-icon"></i></th>
+                                <th width="15%">Selling Price</th>
+                                <th width="11%">Purchase Price</th>
+                                <th width="4%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td class="item-name-cell">
+                                    <div class="main-title">Godaddy Domain</div>
+                                    <span class="sub-badge-label">ssl</span>
+                                </td>
+                                <td>go-123</td>
+                                <td>0 ANA</td>
+                                <td class="price-value">₹ 2,000</td>
+                                <td class="muted-dash">-</td>
+                                <td class="actions-cell"><i class="fa-solid fa-ellipsis-vertical"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="excel-upload-card">
+                    <div class="upload-left-illustration">
+                        <div class="monitor-mock-box"><i class="fa-solid fa-cubes"></i></div>
+                    </div>
+                    <div class="upload-right-content">
+                        <h3>Add Multiple items at once</h3>
+                        <p>Bulk Upload Items from Product Library or Other Software like Vyapar, Tally, Marg & Busy</p>
+                        <div class="upload-btn-group">
+                            <button class="btn-sub-action"><i class="fa-solid fa-cloud-arrow-down"></i> Import
+                                Items</button>
+                            <button class="btn-sub-action"><i class="fa-solid fa-book-bookmark"></i> Product
+                                Library</button>
+                            <button class="btn-excel-primary"><i class="fa-solid fa-file-excel"></i> Upload
+                                Excel</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-backdrop-overlay" id="newItemModal">
+        <div class="modal-window-box">
+
+            <div class="modal-header">
+                <h3>Create New Item</h3>
+                <i class="fa-solid fa-xmark close-modal-btn" onclick="toggleItemModal(false)"></i>
+            </div>
+
+            <div class="modal-split-body">
+
+                <div class="modal-left-nav-tabs">
+                    <button class="tab-item active"><i class="fa-solid fa-id-card"></i> Basic Details <span
+                            class="required-dot">*</span></button>
+
+                    <div class="advance-section-label">Advance Details</div>
+                    <button class="tab-item"><i class="fa-solid fa-boxes-stacked"></i> Stock Details</button>
+                    <button class="tab-item"><i class="fa-solid fa-tags"></i> Pricing Details</button>
+                    <button class="tab-item"><i class="fa-solid fa-user-tag"></i> Party Wise Prices</button>
+                    <button class="tab-item"><i class="fa-solid fa-square-poll-horizontal"></i> Custom Fields</button>
+                </div>
+
+                <form class="modal-right-form-content">
+
+                    <div class="form-row-grid column-2">
+                        <div class="form-group-block">
+                            <label class="input-field-label">Item Type <span class="required-dot">*</span></label>
+                            <div class="radio-toggle-group">
+                                <label class="radio-label-pill checked">
+                                    <input type="radio" name="item_type" checked> Product <span
+                                        class="custom-radio-dot"></span>
+                                </label>
+                                <label class="radio-label-pill">
+                                    <input type="radio" name="item_type"> Service <span class="custom-radio-dot"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group-block">
+                            <label class="input-field-label">Category</label>
+                            <div class="select-dropdown-wrapper">
+                                <select>
+                                    <option>Search Categories</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row-grid column-2 margin-top-md">
+                        <div class="form-group-block">
+                            <label class="input-field-label">Item Name <span class="required-dot">*</span></label>
+                            <input type="text" class="form-text-input" placeholder="ex: Maggie 20gm">
+                        </div>
+
+                        <div class="form-group-block flex-center-space-between">
+                            <span class="inline-toggle-label">Show Item in Online Store</span>
+                            <label class="switch-toggle-btn">
+                                <input type="checkbox">
+                                <span class="switch-slider-round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row-grid column-2 margin-top-md">
+                        <div class="form-group-block">
+                            <label class="input-field-label">Sales Price</label>
+                            <div class="input-inner-addon-group">
+                                <span class="addon-prefix">₹</span>
+                                <input type="text" class="form-text-input dynamic-padding" placeholder="ex: ₹200">
+                                <div class="addon-select-suffix">
+                                    <select>
+                                        <option>With Tax</option>
+                                        <option>Without Tax</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-block">
+                            <label class="input-field-label">GST Tax Rate(%)</label>
+                            <div class="select-dropdown-wrapper clear-search-icon">
+                                <i class="fa-solid fa-magnifying-glass select-embedded-glass"></i>
+                                <select class="indent-select-text">
+                                    <option>None</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row-grid column-2 margin-top-md">
+                        <div class="form-group-block">
+                            <label class="input-field-label">Measuring Unit</label>
+                            <div class="select-dropdown-wrapper clear-search-icon">
+                                <i class="fa-solid fa-magnifying-glass select-embedded-glass"></i>
+                                <select class="indent-select-text">
+                                    <option>Pieces(PCS)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group-block">
+                            <label class="input-field-label">Opening Stock</label>
+                            <div class="input-inner-addon-group">
+                                <input type="text" class="form-text-input" placeholder="ex: 150 PCS">
+                                <span class="addon-text-suffix">PCS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer-action-strip">
+                <button class="btn-modal-cancel" onclick="toggleItemModal(false)">Cancel</button>
+                <div class="modal-save-group">
+                    <button class="btn-modal-secondary-save">Save & New</button>
+                    <button class="btn-modal-primary-save" disabled>Save Item</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleItemModal(shouldShow) {
+            const modal = document.getElementById('newItemModal');
+            modal.style.display = shouldShow ? 'flex' : 'none';
+        }
+    </script>
+
+</body>
+
+</html>

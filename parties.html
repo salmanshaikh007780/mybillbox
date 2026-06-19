@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parties Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<style>
+    :root {
+        --app-bg: #f8fafc;
+        --sidebar-bg: #111c2e;
+        --sidebar-text: #94a3b8;
+        --border-color: #cbd5e1;
+        --border-light: #e2e8f0;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --primary-indigo: #4f46e5;
+        --text-indigo: #4338ca;
+        --indicator-green: #16a34a;
+        --indicator-red: #dc2626;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+        background: var(--app-bg);
+        color: var(--text-main);
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .app-container {
+        display: flex;
+        height: 100vh;
+    }
+
+    /* Sidebar Component Drawer Layout styles */
+    .sidebar {
+        width: 240px;
+        background: var(--sidebar-bg);
+        color: #fff;
+        padding: 16px 0;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .business-profile {
+        padding: 0 16px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #1f2937;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        background: #6d28d9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .profile-info h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #f8fafc;
+    }
+
+    .profile-info p {
+        font-size: 11px;
+        color: var(--sidebar-text);
+    }
+
+    .btn-create-invoice {
+        margin: 16px;
+        background: #fff;
+        border: none;
+        color: #1e293b;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .nav-links {
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #475569;
+        padding: 16px 16px 6px;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-links a {
+        padding: 10px 16px;
+        color: var(--sidebar-text);
+        font-size: 13px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        background: #1e293b;
+        color: #fff;
+    }
+
+    .nav-links a.active {
+        background: #1e2538;
+        color: #fff;
+        font-weight: 600;
+        border-left: 4px solid var(--primary-indigo);
+        padding-left: 12px;
+    }
+
+    .sub-arrow {
+        margin-left: auto;
+        font-size: 10px;
+    }
+
+    .sub-nav-links {
+        background: #0f172a;
+        padding: 2px 0;
+    }
+
+    .sub-nav-links a {
+        padding-left: 40px;
+        font-size: 12.5px;
+        color: #cbd5e1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sub-nav-links a.sub-active {
+        background: #1e293b;
+        color: #38bdf8;
+        font-weight: 600;
+    }
+
+    .badge-new {
+        background: #ef4444;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 4px;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+
+    .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid #1f2937;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sidebar-footer a {
+        color: var(--sidebar-text);
+        font-size: 13px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .security-badges {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #475569;
+        font-weight: 500;
+    }
+
+    /* Content Window Viewports Layout styles */
+    .main-workspace {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .workspace-header {
+        background: #fff;
+        height: 56px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+        flex-shrink: 0;
+    }
+
+    .workspace-header h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .header-right-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn-outline-purple {
+        background: #fff;
+        border: 1px solid #c084fc;
+        color: #6b21a8;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-outline-gray {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        color: #475569;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .icon-action-btn {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    /* Canvas Container Content blocks rules */
+    .dashboard-canvas {
+        padding: 16px 24px;
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: #f8fafc;
+    }
+
+    /* Promotional Top Banner Notice */
+    .promo-banner-dark {
+        background: #332211;
+        background-image: linear-gradient(to right, #2d1e10, #402d1a);
+        color: #ffedd5;
+        border-radius: 6px;
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .promo-banner-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .notepad-graphic {
+        font-size: 24px;
+    }
+
+    .promo-banner-text h4 {
+        font-size: 13.5px;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .promo-banner-text p {
+        font-size: 11.5px;
+        color: #cbd5e1;
+    }
+
+    .promo-banner-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .btn-white-action {
+        background: #ffffff;
+        border: none;
+        color: #1e293b;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .close-banner-btn {
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    /* Triple Summary Card Panel Grid rules */
+    .parties-summary-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: 16px;
+    }
+
+    .summary-card {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        padding: 14px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .active-blue-border {
+        border: 1px solid #4f46e5;
+        background: #e0e7ff;
+    }
+
+    .card-label {
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .text-indigo {
+        color: var(--text-indigo);
+    }
+
+    .text-green {
+        color: var(--indicator-green);
+    }
+
+    .text-red {
+        color: var(--indicator-red);
+    }
+
+    .card-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    /* Middle Horizontal Filter Toolbar Strip rules */
+    .filter-action-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .search-box-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding-right: 10px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .search-box-wrapper input {
+        height: 34px;
+        width: 220px;
+        border: none;
+        padding-left: 32px;
+        font-size: 12.5px;
+        outline: none;
+        background: transparent;
+    }
+
+    .caret-search {
+        font-size: 10px;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .actions-right-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-dropdown-outline {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        height: 34px;
+        padding: 0 14px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #475569;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-create-party {
+        background: #4f46e5;
+        border: none;
+        color: #ffffff;
+        height: 34px;
+        padding: 0 18px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    /* Custom Rows Data List View Grid layout structures */
+    .table-container {
+        background: #ffffff;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+    }
+
+    .data-list-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .data-list-table th {
+        background: #f1f5f9;
+        padding: 12px 16px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .sort-icon {
+        font-size: 9px;
+        margin-left: 4px;
+        color: #94a3b8;
+    }
+
+    .data-list-table td {
+        padding: 14px 16px;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .data-list-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .party-name-cell {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .volume-speaker-icon {
+        font-size: 11px;
+        margin-left: 6px;
+        opacity: 0.7;
+    }
+
+    .muted-dash {
+        color: #94a3b8;
+        font-weight: bold;
+    }
+
+    .balance-cell {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .actions-cell {
+        text-align: center;
+        color: #94a3b8;
+        cursor: pointer;
+    }
+
+    /* Lower Excel Direct CTA component box cards elements */
+    .excel-upload-card {
+        background: #eff6ff;
+        border: 1px dashed #3b82f6;
+        border-radius: 8px;
+        padding: 20px 24px;
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .upload-left-illustration {
+        background: #fff;
+        width: 110px;
+        height: 75px;
+        border-radius: 6px;
+        border: 1px solid #dbeafe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .monitor-mock-box {
+        font-size: 32px;
+        color: #3b82f6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mini-boxes-stack {
+        position: absolute;
+        font-size: 14px;
+        bottom: 10px;
+        right: 14px;
+    }
+
+    .upload-right-content h3 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 2px;
+    }
+
+    .upload-right-content p {
+        font-size: 12px;
+        color: #1e40af;
+        margin-bottom: 12px;
+    }
+
+    .btn-excel-download {
+        background: #ffffff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Floating Functional Indicator Buttons system overlay component styles */
+    .floating-action-indicator {
+        position: fixed;
+        bottom: 20px;
+        right: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 999;
+    }
+
+    .info-floating-icon {
+        font-size: 36px;
+        color: #334155;
+        cursor: pointer;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .pending-actions-pill {
+        background: #16a34a;
+        color: #ffffff;
+        padding: 10px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        cursor: pointer;
+    }
+
+    .pill-count {
+        background: #dc2626;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation Frame matching standard application context -->
+        <aside class="sidebar">
+            <div class="business-profile">
+                <div class="avatar">S</div>
+                <div class="profile-info">
+                    <h4>salman enterprise</h4>
+                    <p>9833752903</p>
+                </div>
+            </div>
+        
+            <button class="btn-create-invoice">
+                <i class="fa-solid fa-plus"></i> Create Sales Invoice 
+                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+            </button>
+        
+            <nav class="nav-links">
+                <a href="#"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+                
+                <a href="#" class="active"><i class="fa-solid fa-box"></i> Item</a>
+                
+                <a href="#"><i class="fa-solid fa-user-group"></i> Clients</a>
+                
+                <a href="#"><i class="fa-solid fa-file-lines"></i> Proforma</a>
+                
+                <a href="#"><i class="fa-solid fa-receipt"></i> Invoice</a>
+            </nav>
+        </aside>
+
+        <!-- Main Workspace Frame -->
+        <main class="main-workspace">
+            <header class="workspace-header">
+                <h2>Parties</h2>
+                <div class="header-right-actions">
+                    <button class="btn-outline-purple"><i class="fa-solid fa-link"></i> SharedLedger Portal</button>
+                    <div class="dropdown-container">
+                        <button class="btn-outline-gray"><i class="fa-solid fa-file-invoice"></i> Reports <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <button class="icon-action-btn"><i class="fa-solid fa-gear"></i></button>
+                    <button class="icon-action-btn"><i class="fa-solid fa-print"></i></button>
+                </div>
+            </header>
+
+            <div class="dashboard-canvas">
+
+                <!-- Promotional Info Banner Component -->
+                <div class="promo-banner-dark">
+                    <div class="promo-banner-left">
+                        <div class="notepad-graphic">📝</div>
+                        <div class="promo-banner-text">
+                            <h4>Are you Tired of asking Party's Ledger?</h4>
+                            <p>Access sharedledgers and turn invoices into purchases instantly.</p>
+                        </div>
+                    </div>
+                    <div class="promo-banner-right">
+                        <button class="btn-white-action">View SharedLedgers</button>
+                        <i class="fa-solid fa-xmark close-banner-btn"></i>
+                    </div>
+                </div>
+
+                <!-- Triple Row Stat Summary Cards Panel -->
+                <div class="parties-summary-grid">
+                    <div class="summary-card active-blue-border">
+                        <span class="card-label text-indigo"><i class="fa-solid fa-users"></i> All Parties</span>
+                        <span class="card-value">2</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="card-label text-green"><i class="fa-solid fa-arrow-down"></i> To Collect</span>
+                        <span class="card-value">₹ 0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="card-label text-red"><i class="fa-solid fa-arrow-up"></i> To Pay</span>
+                        <span class="card-value">₹ 0</span>
+                    </div>
+                </div>
+
+                <!-- Actions and Filter Strip -->
+                <div class="filter-action-strip">
+                    <div class="filters-left-group">
+                        <div class="search-box-wrapper">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" placeholder="Search Categories">
+                            <i class="fa-solid fa-chevron-down caret-search"></i>
+                        </div>
+                    </div>
+                    <div class="actions-right-group">
+                        <button class="btn-dropdown-outline">Bulk Action <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                        <button class="btn-create-party">Create Party</button>
+                    </div>
+                </div>
+
+                <!-- Primary Parties Data Grid Table -->
+                <div class="table-container">
+                    <table class="data-list-table">
+                        <thead>
+                            <tr>
+                                <th width="30%">Party Name <i
+                                        class="fa-solid fa-arrow-down-up-across-line sort-icon"></i></th>
+                                <th width="15%">Category</th>
+                                <th width="20%">Mobile Number</th>
+                                <th width="15%">Party type</th>
+                                <th width="15%">Balance <i class="fa-solid fa-arrow-down-up-across-line sort-icon"></i>
+                                </th>
+                                <th width="5%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="party-name-cell">Cash Sale</td>
+                                <td class="muted-dash">-</td>
+                                <td>9833752903</td>
+                                <td>Customer</td>
+                                <td class="balance-cell">₹ 0</td>
+                                <td class="actions-cell"><i class="fa-solid fa-ellipsis-vertical"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="party-name-cell">Green Media Tehnology <span
+                                        class="volume-speaker-icon">📢</span></td>
+                                <td class="muted-dash">-</td>
+                                <td>9136340142</td>
+                                <td>Customer</td>
+                                <td class="balance-cell">₹ 0</td>
+                                <td class="actions-cell"><i class="fa-solid fa-ellipsis-vertical"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Lower Excel Bulk Upload CTA Area Card -->
+                <div class="excel-upload-card">
+                    <div class="upload-left-illustration">
+                        <div class="monitor-mock-box">
+                            <i class="fa-solid fa-desktop"></i>
+                            <div class="mini-boxes-stack">📦📦</div>
+                        </div>
+                    </div>
+                    <div class="upload-right-content">
+                        <h3>Add Multiple Parties at once</h3>
+                        <p>Bulk upload all your parties to myBillBook using excel</p>
+                        <button class="btn-excel-download"><i class="fa-solid fa-file-excel"></i> Upload Excel</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Right Sticky Action Counter Floating Indicator Button Components -->
+    <div class="floating-action-indicator">
+        <i class="fa-solid fa-circle-question info-floating-icon"></i>
+        <div class="pending-actions-pill">
+            <i class="fa-solid fa-wave-square"></i> Pending Actions <span class="pill-count">2</span>
+        </div>
+    </div>
+
+</body>
+
+</html>
