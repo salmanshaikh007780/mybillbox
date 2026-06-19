@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Inventory Dashboard</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+        }
+
+        .mbinv-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+
+        .mbinv-sidebar {
+            width: 260px;
+            background: #08152f;
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .mbinv-company {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .mbinv-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #7c5cff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .mbinv-company-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mbinv-company-mobile {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .mbinv-create-invoice {
+            width: 90%;
+            margin: 0 auto 15px;
+            background: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .mbinv-menu {
+            list-style: none;
+        }
+
+        .mbinv-menu li {
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .mbinv-menu li:hover {
+            background: #13224a;
+        }
+
+        .mbinv-active {
+            background: #3346b4;
+        }
+
+        .mbinv-menu i {
+            width: 25px;
+        }
+
+        /* Main */
+
+        .mbinv-main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 25px;
+        }
+
+        .mbinv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mbinv-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .mbinv-header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mbinv-btn {
+            border: 1px solid #ddd;
+            background: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .mbinv-banner {
+            background: #f3c572;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mbinv-banner h3 {
+            font-size: 22px;
+        }
+
+        .mbinv-white-btn {
+            background: #fff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Cards */
+
+        .mbinv-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mbinv-card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .mbinv-card span {
+            color: #666;
+        }
+
+        .mbinv-card h2 {
+            margin-top: 10px;
+            font-size: 32px;
+        }
+
+        /* Filters */
+
+        .mbinv-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mbinv-input,
+        .mbinv-select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .mbinv-input {
+            width: 250px;
+        }
+
+        .mbinv-lowstock {
+            padding: 12px 20px;
+            border: none;
+            background: #eceff4;
+            border-radius: 8px;
+        }
+
+        .mbinv-right {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .mbinv-create-item {
+            background: #5a47ff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+
+        /* Table */
+
+        .mbinv-table-box {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e8e8e8;
+        }
+
+        .mbinv-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mbinv-table thead {
+            background: #f7f8fb;
+        }
+
+        .mbinv-table th {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mbinv-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Upload Section */
+
+        .mbinv-upload-box {
+            margin-top: 20px;
+            background: #e9efff;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .mbinv-upload-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .mbinv-upload-box p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .mbinv-upload-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mbinv-upload-buttons button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .mbinv-excel {
+            background: #16a34a !important;
+            color: #fff;
+        }
+
+        @media (max-width: 992px) {
+            .mbinv-sidebar {
+                width: 80px;
+            }
+
+            .mbinv-main {
+                margin-left: 80px;
+            }
+
+            .mbinv-company-name,
+            .mbinv-company-mobile {
+                display: none;
+            }
+
+            .mbinv-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mbitem-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .mbitem-modal {
+            width: 900px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .mbitem-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mbitem-close {
+            border: none;
+            background: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .mbitem-body {
+            display: flex;
+        }
+
+        .mbitem-sidebar {
+            width: 220px;
+            border-right: 1px solid #eee;
+            padding: 20px;
+        }
+
+        .mbitem-menu {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+
+        .mbitem-menu.active {
+            background: #f1edff;
+            color: #5a47ff;
+        }
+
+        .mbitem-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .mbitem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .mbitem-field label {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .mbitem-field input,
+        .mbitem-field select {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0 10px;
+        }
+
+        .mbitem-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mbitem-save {
+            background: #5a47ff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+
+        .mbitem-radio-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .mbitem-radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .mbitem-radio-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: #5a47ff;
+        }
+
+        .mbitem-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mbitem-footer-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mbitem-cancel {
+            border: 1px solid #dcdcdc;
+            background: #fff;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .mbitem-save-new {
+            border: 1px solid #dcdcdc;
+            background: #fff;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .mbitem-save {
+            background: #5a47ff;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .import-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        .import-box {
+            width: 700px;
+            max-width: 95%;
+            background: #fff;
+            border-radius: 12px;
+            margin: 80px auto;
+            overflow: hidden;
+        }
+
+        .import-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .import-header h3 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .import-header span {
+            cursor: pointer;
+            font-size: 28px;
+        }
+
+        .import-top {
+            background: #eef6ff;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .folder-box {
+            width: 130px;
+            height: 90px;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .arrow {
+            font-size: 30px;
+            color: #4f46e5;
+        }
+
+        .software-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .software-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 25px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .software-card:hover,
+        .software-card.active {
+            border-color: #4f46e5;
+            background: #f5f3ff;
+        }
+
+        .import-footer {
+            padding: 20px;
+            text-align: right;
+            border-top: 1px solid #eee;
+        }
+
+        .next-btn {
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .mbinv-menu li a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+
+        .mbinv-menu li a:visited {
+            color: #fff;
+        }
+
+        .mbinv-menu li a:hover {
+            color: #fff;
+        }
+
+        .mbinv-menu li {
+            padding: 14px 20px;
+            cursor: pointer;
+        }
+
+        .mbinv-menu li.mbinv-active {
+            background: #3f51f5;
+            color: #fff;
+        }
+
+        .mbinv-menu li.mbinv-active a {
+            color: #fff !important;
+        }
+
+        .mbitem-cancel,
+        .mbitem-save-new {
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .mbitem-cancel {
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            color: #333;
+        }
+
+        .mbitem-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .mbitem-save-new {
+            background: #5a47ff;
+            border: 1px solid #5a47ff;
+            color: #fff;
+        }
+
+        .mbitem-save-new:hover {
+            background: #4836e6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mbinv-wrapper">
+        <aside class="mbinv-sidebar">
+            <div class="mbinv-company">
+                <div class="mbinv-avatar">S</div>
+
+                <div>
+                    <div class="mbinv-company-name">salman enterprise</div>
+                    <div class="mbinv-company-mobile">9833752903</div>
+                </div>
+            </div>
+
+            <button class="mbinv-create-invoice">+ Create Sales Invoice</button>
+
+            <ul class="mbinv-menu">
+                <li> <a href="dashboard.html"><i class="fa fa-users"></i> Dashboard </li>
+
+                <li class="mbinv-active">
+                    <a href="item.html">
+                        <i class="fa fa-box"></i> Item
+                    </a>
+                </li>
+
+                <li><i class="fa fa-warehouse"></i> Clients</li>
+
+                <li><i class="fa fa-tag"></i> Proforma</li>
+
+                <li><i class="fa fa-cart-shopping"></i> Invoice</li>
+            </ul>
+        </aside>
+
+        <main class="mbinv-main">
+            <div class="mbinv-header">
+                <div class="mbinv-title">Items</div>
+
+                <div class="mbinv-header-actions">
+                    <button class="mbinv-btn">Manage Offer</button>
+                    <button class="mbinv-btn">Reports</button>
+                    <button class="mbinv-btn">
+                        <i class="fa fa-gear"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mbinv-banner">
+                <h3>Launch Offers on Your Items</h3>
+
+                <button class="mbinv-white-btn">Create Offer Now</button>
+            </div>
+
+            <div class="mbinv-cards">
+                <div class="mbinv-card">
+                    <span>Stock Value</span>
+                    <h2>₹ 0</h2>
+                </div>
+
+                <div class="mbinv-card">
+                    <span>Low Stock</span>
+                    <h2>0</h2>
+                </div>
+            </div>
+
+            <div class="mbinv-filters">
+                <input class="mbinv-input" type="text" placeholder="Search Item" />
+
+                <select class="mbinv-select">
+                    <option>Search Categories</option>
+                </select>
+
+                <button class="mbinv-lowstock">Low Stock</button>
+
+                <div class="mbinv-right">
+                    <button class="mbinv-btn">Bulk Actions</button>
+
+                    <button class="mbinv-create-item" id="mbinvOpenModal">
+                        Create Item
+                    </button>
+                </div>
+            </div>
+
+            <div class="mbinv-table-box">
+                <table class="mbinv-table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Item Code</th>
+                            <th>Stock Qty</th>
+                            <th>Selling Price</th>
+                            <th>Purchase Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="itemTableBody">
+                        <tr>
+                            <td>abc</td>
+                            <td>-</td>
+                            <td>0 PCS</td>
+                            <td>₹ 2,000</td>
+                            <td>-</td>
+                            <td>
+                                <i class="fa fa-ellipsis-vertical"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mbinv-upload-box">
+                <h3>Add Multiple Items at Once</h3>
+
+                <p>
+                    Bulk Upload Items from Product Library or Other Software like
+                    Vyapar, Tally, Marg & Busy.
+                </p>
+
+                <div class="mbinv-upload-buttons">
+                    <button id="importItemsBtn">Import Items</button>
+
+                    <div id="importModal" class="import-modal">
+                        <div class="import-box">
+                            <div class="import-header">
+                                <h3>Bulk Add Items from Other Softwares</h3>
+                                <span id="closeImportModal">&times;</span>
+                            </div>
+
+                            <div class="import-top">
+                                <div class="folder-box">📁<br />Other Software</div>
+                                <div class="arrow">➜</div>
+                                <div class="folder-box">📦<br />Inventory</div>
+                            </div>
+
+                            <div class="software-grid">
+                                <div class="software-card">Vyapar</div>
+                                <div class="software-card">Tally</div>
+                                <div class="software-card">Marg</div>
+                                <div class="software-card">Custom Software</div>
+                            </div>
+
+                            <div class="import-footer">
+                                <button class="next-btn">Next</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="productLibraryBtn">Product Library</button>
+
+                    <button id="uploadExcelBtn" class="mbinv-excel">
+                        Upload Excel
+                    </button>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none" />
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Create Item Modal -->
+    <div class="mbitem-modal-overlay" id="mbitemModal">
+        <div class="mbitem-modal">
+            <div class="mbitem-header">
+                <h3>Create New Item</h3>
+
+                <button class="mbitem-close" id="mbinvCloseModal">&times;</button>
+            </div>
+
+            <div class="mbitem-body">
+                <!-- Left Menu -->
+                <div class="mbitem-sidebar">
+                    <div class="mbitem-menu active">Basic Details</div>
+
+                    <div class="mbitem-menu">Stock Details</div>
+
+                    <div class="mbitem-menu">Pricing Details</div>
+
+                    <div class="mbitem-menu">Party Wise Prices</div>
+
+                    <div class="mbitem-menu">Custom Fields</div>
+                </div>
+
+                <!-- Right Content -->
+
+                <div class="mbitem-content">
+                    <div class="mbitem-grid">
+                        <div class="mbitem-field">
+                            <label>Item Type</label>
+
+                            <div class="mbitem-radio-group">
+                                <label>
+                                    <input type="radio" name="itemType" id="mbProductRadio" checked>
+                                    Product
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="itemType" id="mbServiceRadio">
+                                    Service
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- PRODUCT CONTENT -->
+                        <div class="mbUniqueProductSection">
+
+                            <div class="mbitem-field">
+                                <label>Item Name</label>
+                                <input type="text" placeholder="ex: Maggie 20gm">
+                            </div>
+
+                            <div class="mbProductBox">
+                                Product Details Here
+                            </div>
+
+                        </div>
+
+                        <!-- SERVICE CONTENT -->
+                        <div class="mbUniqueServiceSection" style="display:none;">
+
+                            <div class="mbitem-field">
+                                <label>Service Name</label>
+                                <input type="text" placeholder="ex: Mobile Service">
+                            </div>
+
+                            <div class="mbServiceBox">
+                                Service Details Here
+                            </div>
+
+                        </div>
+                        <div class="mbitem-field">
+                            <label>Category</label>
+
+                            <select>
+                                <option>Select Category</option>
+                            </select>
+                        </div>
+
+                        <div class="mbitem-field">
+                            <label>Item Name</label>
+
+                            <input type="text" class="mbitem-input" id="itemName" placeholder="ex: Maggie 20gm" />
+                        </div>
+
+                        <div class="mbitem-field">
+                            <label>GST Tax Rate (%)</label>
+
+                            <select>
+                                <option>None</option>
+                            </select>
+                        </div>
+
+                        <div class="mbitem-field">
+                            <label>Sales Price</label>
+
+                            <input type="text" placeholder="₹200" />
+                        </div>
+
+                        <div class="mbitem-field">
+                            <label>Opening Stock</label>
+
+                            <input type="text" placeholder="150 PCS" />
+                        </div>
+
+                        <div class="mbitem-field">
+                            <label>Measuring Unit</label>
+
+                            <select>
+                                <option>Pieces (PCS)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mbitem-footer">
+                <button class="mbitem-cancel">Cancel</button>
+
+                <div class="mbitem-footer-right">
+                    <button class="mbitem-save-new">Save & New</button>
+
+                    <button class="mbitem-save" id="saveItemBtn">Save Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("mbitemModal");
+            const openBtn = document.getElementById("mbinvOpenModal");
+            const closeBtn = document.getElementById("mbinvCloseModal");
+
+            openBtn.addEventListener("click", function () {
+                modal.style.display = "flex";
+            });
+
+            closeBtn.addEventListener("click", function () {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", function (e) {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        document
+            .getElementById("saveItemBtn")
+            .addEventListener("click", function () {
+                let itemName = document.getElementById("itemName").value;
+
+                if (itemName.trim() === "") {
+                    alert("Please enter item name");
+                    return;
+                }
+
+                alert("Item Saved Successfully");
+
+                document.getElementById("mbitemModal").style.display = "none";
+            });
+        document
+            .getElementById("saveItemBtn")
+            .addEventListener("click", function () {
+                let itemName = document.getElementById("itemName").value;
+
+                if (itemName.trim() === "") {
+                    alert("Please enter item name");
+                    return;
+                }
+
+                let row = `
+        <tr>
+            <td>${itemName}</td>
+            <td>-</td>
+            <td>0 PCS</td>
+            <td>₹ 0</td>
+            <td>-</td>
+            <td><i class="fa fa-ellipsis-vertical"></i></td>
+        </tr>
+    `;
+
+                document.getElementById("itemTableBody").innerHTML += row;
+
+                document.getElementById("mbitemModal").style.display = "none";
+
+                document.getElementById("itemName").value = "";
+            });
+
+        document
+            .getElementById("productLibraryBtn")
+            .addEventListener("click", function () {
+                alert("Product Library Clicked");
+                // Redirect or open product library
+            });
+
+        document
+            .getElementById("uploadExcelBtn")
+            .addEventListener("click", function () {
+                document.getElementById("excelFile").click();
+            });
+
+        document
+            .getElementById("excelFile")
+            .addEventListener("change", function () {
+                if (this.files.length > 0) {
+                    alert("Selected File: " + this.files[0].name);
+
+                    // Upload file using AJAX or Form Submit
+                    console.log(this.files[0]);
+                }
+            });
+        const modal = document.getElementById("importModal");
+
+        document.getElementById("importItemsBtn").onclick = function () {
+            modal.style.display = "block";
+        };
+
+        document.getElementById("closeImportModal").onclick = function () {
+            modal.style.display = "none";
+        };
+
+        document.querySelectorAll(".software-card").forEach((card) => {
+            card.addEventListener("click", function () {
+                document
+                    .querySelectorAll(".software-card")
+                    .forEach((c) => c.classList.remove("active"));
+
+                this.classList.add("active");
+            });
+        });
+
+        document.querySelectorAll('.mbinv-menu li').forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.mbinv-menu li')
+                    .forEach(li => li.classList.remove('mbinv-active'));
+
+                this.classList.add('mbinv-active');
+            });
+        });
+        const mbProductRadio = document.getElementById("mbProductRadio");
+        const mbServiceRadio = document.getElementById("mbServiceRadio");
+
+        const mbProductSection =
+            document.querySelector(".mbUniqueProductSection");
+
+        const mbServiceSection =
+            document.querySelector(".mbUniqueServiceSection");
+
+        mbProductRadio.addEventListener("change", function () {
+
+            if (this.checked) {
+                mbProductSection.style.display = "block";
+                mbServiceSection.style.display = "none";
+            }
+
+        });
+
+        mbServiceRadio.addEventListener("change", function () {
+
+            if (this.checked) {
+                mbProductSection.style.display = "none";
+                mbServiceSection.style.display = "block";
+            }
+
+        });
+    </script>
+</body>
+
+</html>
